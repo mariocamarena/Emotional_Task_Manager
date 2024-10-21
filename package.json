@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/language": "^6.5.0",
     "express": "^4.21.1",
     "sequelize": "^6.37.4",
     "sqlite3": "^5.1.7"
