@@ -1,28 +1,20 @@
 const express = require('express');
 const app = express();
 const DiaryEntry = require('./models/diaryEntry');
+const cors = require('cors');
 
 const { LanguageServiceClient } = require('@google-cloud/language')
 const client = new LanguageServiceClient();
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 app.use(express.json());
+app.use(cors());
 
 app.get('/',(req,res) => {
     res.send('Hello World!');
 });
 
-
-// Create: Adds new data (e.g., creating a new user or task).
-    // Example: POST /tasks adds a new task to your task manager.
-// Read: Retrieves existing data (e.g., getting a list of users or tasks).
-    // Example: GET /tasks fetches all tasks from the database.
-// Update: Modifies existing data (e.g., updating a user’s information or changing a task’s details).
-    // Example: PUT /tasks/:id updates a specific task with new information.
-// Delete: Removes existing data (e.g., deleting a task or user).
-    // Example: DELETE /tasks/:id removes a specific task from the database.
-//let tasks = [];
 
 // Create Diary Entry
 app.post('/diary', async (req, res) => {
