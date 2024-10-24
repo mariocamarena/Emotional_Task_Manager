@@ -22,7 +22,7 @@ app.get('/',(req,res) => {
 app.post('/diary', async (req, res) => {
     try {
       const { entry } = req.body;
-      
+
       const [result] = await client.analyzeSentiment({
         document: {
           content: entry,
@@ -32,14 +32,20 @@ app.post('/diary', async (req, res) => {
 
       const sentiment = result.documentSentiment;
       const sentimentScore = sentiment.score;
+      const sentimentMagnitude = sentiment.magnitude;
+
       let emotionFeedback = '';
-  
-      if (sentimentScore > 0.25) {
+      
+      if (sentimentScore > 0.9 && sentimentMagnitude > 1.0) {
+        emotionFeedback = 'Very Positive';
+      } else if (sentimentScore > 0.25) {
         emotionFeedback = 'Positive';
-      } else if (sentimentScore < -0.25) {
-        emotionFeedback = 'Negative';
-      } else {
+      } else if (sentimentScore >= -0.25) {
         emotionFeedback = 'Neutral';
+      } else if (sentimentScore < -0.9 && sentimentMagnitude > 1.0) {
+        emotionFeedback = 'Very Negative';
+      } else {
+        emotionFeedback = 'Negative';
       }
 
       const diaryEntry  = await DiaryEntry.create({entry,emotionFeedback});
