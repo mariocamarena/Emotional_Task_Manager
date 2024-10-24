@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const DiaryEntry = require('./models/diaryEntry');
@@ -13,17 +14,40 @@ app.use(cors());
 
 app.get('/',(req,res) => {
     res.send('Hello World!');
+    console.log('Google Credentials Path:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
 });
 
 
 // Create Diary Entry
 app.post('/diary', async (req, res) => {
     try {
-      const diaryEntry  = await DiaryEntry.create(req.body);
+      const { entry } = req.body;
+      
+      const [result] = await client.analyzeSentiment({
+        document: {
+          content: entry,
+          type: 'PLAIN_TEXT',
+        },
+      });
+
+      const sentiment = result.documentSentiment;
+      const sentimentScore = sentiment.score;
+      let emotionFeedback = '';
+  
+      if (sentimentScore > 0.25) {
+        emotionFeedback = 'Positive';
+      } else if (sentimentScore < -0.25) {
+        emotionFeedback = 'Negative';
+      } else {
+        emotionFeedback = 'Neutral';
+      }
+
+      const diaryEntry  = await DiaryEntry.create({entry,emotionFeedback});
       res.status(201).send(diaryEntry);
     } 
     catch (error) {
-      res.status(400).send(error.message);
+      console.error('Error processing sentiment:', error);
+      res.status(500).send('An error occurred while processing sentiment.');
     }
 });
   
